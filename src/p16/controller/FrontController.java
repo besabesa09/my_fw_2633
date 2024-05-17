@@ -47,7 +47,7 @@ public class FrontController extends HttpServlet {
         if (!scanned) {
             // Scanner les contrôleurs et stocker la liste dans l'attribut
             try {
-                this.setControllers(ScanController.goScan(packageName));
+                this.setControllers(ScanController.goScan(packageName, Controller.class));
                 scanned = true;
             } catch (ClassNotFoundException | IOException e) {
                 throw new ServletException("Erreur lors du scan des contrôleurs", e);
