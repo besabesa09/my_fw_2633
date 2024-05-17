@@ -4,6 +4,7 @@ import p16.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -33,13 +34,13 @@ public class ScanController {
         return classes;
     }
     
-    public static ArrayList<Class<?>> goScan(String packageName) throws ClassNotFoundException, IOException {
+    public static ArrayList<Class<?>> goScan(String packageName, Class<? extends Annotation> annotationClass) throws ClassNotFoundException, IOException {
         ArrayList<Class<?>> classes = allClasses(packageName);
 
         ArrayList<Class<?>> result = new ArrayList<Class<?>>();
         
         for(Class<?> clazz : classes) {
-            if (clazz.isAnnotationPresent(Controller.class)) {
+            if (clazz.isAnnotationPresent(annotationClass)) {
                 result.add(clazz);
             }
         }
