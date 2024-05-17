@@ -3,14 +3,26 @@ mkdir "temp"
 set jar="D:\ITU\S4\Web Dynamique\Clone_Sprint0\my_fw_2633\lib\*"
 set javaako="D:\ITU\S4\Web Dynamique\Clone_Sprint0\my_fw_2633\src\"
 
-@REM Compilation des fichiers dans le répertoire src et ses sous-répertoires
+@REM Copie des fichiers .java dans le répertoire temp
 for /r ".\src" %%f in (*.java) do (
-    javac -cp %jar% -d "temp" "%%f"
+    copy "%%f" "temp\%%~nf.java"
 )
+
+@REM Création du répertoire compiler dans temp
+mkdir "compiler"
+
+@REM Changement de répertoire courant vers temp
+cd temp
+
+@REM Compilation des fichiers dans le répertoire courant et ses sous-répertoires
+javac -cp %jar% -d "../compiler" *.java
+
+cd ..
 
 @set libTest="D:\ITU\S4\Web Dynamique\Clone_Sprint0\Test\lib"
 
-jar cvf "lodyFrame.jar" -C lodyFrame/ .
-move "lodyFrame.jar" %libTest%
+jar cvf "sprint_1.jar" -C compiler/ .
+move "sprint_1.jar" %libTest%
 
 rmdir /q/s "temp"
+rmdir /q/s "compiler"
