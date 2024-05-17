@@ -1,14 +1,31 @@
 package p16.controller;
 
+import p16.annotation.Controller;
+import p16.model.ScanController;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class FrontController extends HttpServlet{
+@Controller
+public class FrontController extends HttpServlet {
+
+    private ArrayList<Class<?>> controllers;
+    private static boolean scanned = false;
+
+    // getter et setter
+    public ArrayList<Class<?>> getControllers() {
+        return controllers;
+    }
+
+    public void setControllers(ArrayList<Class<?>> controllers) {
+        this.controllers = controllers;
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -20,16 +37,30 @@ public class FrontController extends HttpServlet{
         processRequest(req, resp);
     }
 
-    private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+    private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String url = req.getRequestURI();
 
-    // Définir le type de contenu de la réponse
-    resp.setContentType("text/html");
+        // Récupérer la valeur de l'init-param package_name
+        String packageName = this.getInitParameter("package_name");
 
-    // Obtenir le PrintWriter pour écrire dans la réponse
-    PrintWriter aff = resp.getWriter();
-
-    // Écrire le message dans la réponse
-    aff.println("Bienvenue dans le test de Sprint 0. URL : " + url);
+        // Vérifier si les contrôleurs ont déjà été scannés
+        if (!scanned) {
+            // Scanner les contrôleurs et stocker la liste dans l'attribut
+            try {
+                this.setControllers(ScanController.goScan(packageName));
+                scanned = true;
+            } catch (ClassNotFoundException | IOException e) {
+                throw new ServletException("Erreur lors du scan des contrôleurs", e);
+            }
+        }
+        resp.setContentType("text/html");
+        // Afficher la liste des contrôleurs
+        PrintWriter aff = resp.getWriter();
+        aff.println("<h2>test de Sprint 0.<br> URL : </h2>" + url + "<br>");
+        aff.println("<h2>Test sprint 1 </h2><br>");
+        aff.println("Liste des controllers :");
+        for (Class<?> controller : this.getControllers()) {
+            aff.println(controller.getName());
+        }
     }
 }
