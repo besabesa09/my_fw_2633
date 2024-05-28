@@ -21,8 +21,8 @@ cd ..
 
 @set libTest="D:\ITU\S4\Web Dynamique\Clone_Sprint0\Test\lib"
 
-jar cvf "sprint_1.jar" -C compiler/ .
-move "sprint_1.jar" %libTest%
+jar cvf "sprint_2.jar" -C compiler/ .
+move "sprint_2.jar" %libTest%
 
 rmdir /q/s "temp"
 rmdir /q/s "compiler"

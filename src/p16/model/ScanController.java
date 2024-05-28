@@ -1,7 +1,5 @@
 package p16.model;
 
-import p16.annotation.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
