@@ -88,11 +88,26 @@ public class FrontController extends HttpServlet {
         String controllerName = mapping.getClassName();
         String methodName = mapping.getMethodName();
     
-        resp.setContentType("text/html");
-        PrintWriter aff = resp.getWriter();
-        aff.println("<h2>Test sprint 2 </h2><br>");
-        aff.println("<p>Contrôleur : " + controllerName + "</p>");
-        aff.println("<p>Méthode : " + methodName + "</p>");
-    }
-    
+         // Créer une instance du contrôleur
+         try {
+            Class<?> controllerClass = Class.forName(controllerName);
+             Object controllerInstance = controllerClass.newInstance();
+ 
+            // Récupérer la méthode à appeler
+            Method method = controllerClass.getMethod(methodName);
+ 
+            // Appeler la méthode
+            String result = (String) method.invoke(controllerInstance);
+
+            resp.setContentType("text/html");
+            PrintWriter aff = resp.getWriter();
+            aff.println("<h2>Test sprint 3 </h2>");
+            aff.println("<p><strong>Contrôleur</strong> : " + controllerName + "</p>");
+            aff.println("<p><strong>Méthode</strong> : " + methodName + "</p>");
+            aff.println("<p><strong>Execution de la fonction "+ methodName +" :</strong></p>");
+            aff.println(result);
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+    }    
 }
