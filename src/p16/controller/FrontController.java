@@ -3,6 +3,7 @@ package p16.controller;
 import p16.annotation.Controller;
 import p16.annotation.Get;
 import p16.model.Mapping;
+import p16.model.ModelView;
 import p16.model.ScanController;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,21 +93,37 @@ public class FrontController extends HttpServlet {
          // Créer une instance du contrôleur
          try {
             Class<?> controllerClass = Class.forName(controllerName);
-             Object controllerInstance = controllerClass.newInstance();
+            Object controllerInstance = controllerClass.newInstance();
  
-            // Récupérer la méthode à appeler
+            // Récuperation de la méthode à appeler
             Method method = controllerClass.getMethod(methodName);
  
-            // Appeler la méthode
-            String result = (String) method.invoke(controllerInstance);
+            // Appel de la méthode
+            Object result = method.invoke(controllerInstance);
+           
+            if (result instanceof ModelView) {
+            ModelView modelView = (ModelView) result;
+            String viewUrl = modelView.getUrl();
+            HashMap<String, Object> data = modelView.getData();
 
+            // Définir les données en tant qu'attributs de requête
+            for (String key : data.keySet()) {
+                req.setAttribute(key, data.get(key));
+            }
+
+            RequestDispatcher dispat = req.getRequestDispatcher(viewUrl);
+            dispat.forward(req,resp);
+
+        } else { // Si le résultat n'est pas une instance de ModelView, utiliser le code existant
             resp.setContentType("text/html");
             PrintWriter aff = resp.getWriter();
             aff.println("<h2>Test sprint 3 </h2>");
             aff.println("<p><strong>Contrôleur</strong> : " + controllerName + "</p>");
             aff.println("<p><strong>Méthode</strong> : " + methodName + "</p>");
             aff.println("<p><strong>Execution de la fonction "+ methodName +" :</strong></p>");
-            aff.println(result);
+            aff.println(result.toString());
+        }
+
         } catch (Exception e) {
             throw new ServletException(e);
         }
