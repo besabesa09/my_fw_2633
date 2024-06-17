@@ -9,12 +9,15 @@ import p16.exception.UrlException;
 import p16.model.Mapping;
 import p16.model.ModelView;
 import p16.model.ScanController;
+import p16.model.TraiteRequest;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -102,18 +105,33 @@ public class FrontController extends HttpServlet {
         // Récupération nom_contrôleur et méthode
         String controllerName = mapping.getClassName();
         String methodName = mapping.getMethodName();
-    
-         // Créer une instance du contrôleur
-            Class<?> controllerClass = Class.forName(controllerName);
-            Object controllerInstance = controllerClass.newInstance();
- 
-            // Récuperation de la méthode à appeler
-            Method method = controllerClass.getMethod(methodName);
- 
-            // Appel de la méthode
-            Object result = method.invoke(controllerInstance);
-           
-             // Vérifier le type d'objet retourné
+        // Créer une instance du contrôleur
+        Class<?> controllerClass = Class.forName(controllerName);
+        Object controllerInstance = controllerClass.newInstance();
+        // Récuperation de la méthode à appeler
+        Method method = null;
+        for (Method m : controllerClass.getMethods()){
+            if (m.getName().equals(methodName)) {
+                method = m;
+                break;
+            }
+        }
+        if (method == null) {
+            throw new NoSuchMethodException(controllerClass.getName() + "." + methodName + "()");
+        }
+        Object result;
+        // Vérifier si la méthode possède des paramètres
+        Parameter[] parameters = method.getParameters();
+            if (parameters.length > 0) {
+                List<Object> parameterValues = TraiteRequest.parameterMethod(method, req);
+                if (parameterValues.size() != parameters.length) {
+                    throw new IllegalArgumentException("nombre de paramètres envoyés différents des paramètres de la méthode");
+                }
+                result = method.invoke(controllerInstance, parameterValues.toArray());
+            } else {
+                result = method.invoke(controllerInstance);
+            }
+            // Vérifier le type d'objet retourné
             if (result instanceof String || result instanceof ModelView) {
                 // Le type d'objet retourné est valide, continuer le traitement
                 if (result instanceof ModelView) {
