@@ -14,7 +14,6 @@ import p16.model.TraiteRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,16 +120,15 @@ public class FrontController extends HttpServlet {
         }
         Object result;
         // Vérifier si la méthode possède des paramètres
-        Parameter[] parameters = method.getParameters();
-            if (parameters.length > 0) {
-                List<Object> parameterValues = TraiteRequest.parameterMethod(method, req);
-                if (parameterValues.size() != parameters.length) {
+        if (method.getParameterCount() > 0) {
+            List<Object> parameterValues = TraiteRequest.getParameterValuesCombined(method, req);
+                if (parameterValues.size() != method.getParameterCount()) {
                     throw new IllegalArgumentException("nombre de paramètres envoyés différents des paramètres de la méthode");
                 }
-                result = method.invoke(controllerInstance, parameterValues.toArray());
-            } else {
-                result = method.invoke(controllerInstance);
-            }
+            result = method.invoke(controllerInstance, parameterValues.toArray());
+        } else {
+            result = method.invoke(controllerInstance);
+        }
             // Vérifier le type d'objet retourné
             if (result instanceof String || result instanceof ModelView) {
                 // Le type d'objet retourné est valide, continuer le traitement
