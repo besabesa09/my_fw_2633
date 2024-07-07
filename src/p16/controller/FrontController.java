@@ -90,6 +90,7 @@ public class FrontController extends HttpServlet {
     }
 
     private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+        PrintWriter aff = resp.getWriter();
         String url = req.getServletPath();
         try {
         // Check URL
@@ -147,7 +148,6 @@ public class FrontController extends HttpServlet {
 
                 } else { // Si le résultat n'est pas une instance de ModelView, utiliser le code existant
                     resp.setContentType("text/html");
-                    PrintWriter aff = resp.getWriter();
                     aff.println("<h2>Test sprint 3 </h2>");
                     aff.println("<p><strong>Contrôleur</strong> : " + controllerName + "</p>");
                     aff.println("<p><strong>Méthode</strong> : " + methodName + "</p>");
@@ -163,7 +163,7 @@ public class FrontController extends HttpServlet {
         } catch (TypeException e) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            throw new ServletException(e);
+            aff.println(e.getLocalizedMessage());
         }
-    }    
+    }       
 }
