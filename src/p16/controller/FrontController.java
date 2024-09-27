@@ -2,6 +2,7 @@ package p16.controller;
 
 import p16.annotation.Controller;
 import p16.annotation.Get;
+import p16.annotation.RestApi;
 import p16.exception.DuplicateUrlException;
 import p16.exception.NoPackageException;
 import p16.exception.TypeException;
@@ -17,6 +18,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import com.google.gson.Gson;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -130,7 +133,25 @@ public class FrontController extends HttpServlet {
         } else {
             result = method.invoke(controllerInstance);
         }
-            // Vérifier le type d'objet retourné
+        
+        boolean isRestApi = method.isAnnotationPresent(RestApi.class);
+         if (isRestApi) {
+            // La méthode est annotée avec @RestApi, on traite le résultat en JSON
+            resp.setContentType("application/json");
+
+            if (result instanceof ModelView) {
+                // Transformer le 'data' du ModelView en JSON
+                ModelView modelView = (ModelView) result;
+                HashMap<String, Object> data = modelView.getData();
+                String json = new Gson().toJson(data);
+                aff.print(json);
+            } else {
+                // Transformer directement le résultat en JSON
+                String json = new Gson().toJson(result);
+                aff.print(json);
+            }
+        } else {  
+         // Vérifier le type d'objet retourné
             if (result instanceof String || result instanceof ModelView) {
                 // Le type d'objet retourné est valide, continuer le traitement
                 if (result instanceof ModelView) {
@@ -158,6 +179,7 @@ public class FrontController extends HttpServlet {
                 // Le type d'objet retourné n'est pas valide, lancer une exception TypeException
                 throw new TypeException("Erreur: Le type d'objet retourné n'est pas valide (String ou ModelView attendu)");
             }
+        }
         } catch (UrlException e) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (TypeException e) {

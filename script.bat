@@ -1,7 +1,7 @@
 mkdir "temp"
 
-set jar="D:\ITU\S4\Web Dynamique\Clone_Sprint0\my_fw_2633\lib\*"
-set javaako="D:\ITU\S4\Web Dynamique\Clone_Sprint0\my_fw_2633\src\"
+set jar="D:\ITU\S5\FrameWork\my_fw_2633\lib\*"
+set javaako="D:\ITU\S5\FrameWork\my_fw_2633\src\"
 
 @REM Copie des fichiers .java dans le répertoire temp
 for /r ".\src" %%f in (*.java) do (
@@ -19,7 +19,7 @@ javac -cp %jar% -d "../compiler" *.java
 
 cd ..
 
-@set libTest="D:\ITU\S4\Web Dynamique\Clone_Sprint0\Test\lib"
+@set libTest="D:\ITU\S5\FrameWork\Test\lib"
 
 jar cvf "sprint_2.jar" -C compiler/ .
 move "sprint_2.jar" %libTest%
