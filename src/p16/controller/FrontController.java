@@ -2,7 +2,9 @@ package p16.controller;
 
 import p16.annotation.Controller;
 import p16.annotation.Get;
+import p16.annotation.Post;
 import p16.annotation.RestApi;
+import p16.annotation.Url;
 import p16.exception.DuplicateUrlException;
 import p16.exception.NoPackageException;
 import p16.exception.TypeException;
@@ -57,21 +59,28 @@ public class FrontController extends HttpServlet {
             // itérer les contrôleurs et récupérer les méthodes annotées par @Get
             for (Class<?> controller : this.getControllers()) {
                 for (Method method : controller.getDeclaredMethods()) {
-                    if (method.isAnnotationPresent(Get.class)) {
+                    if (method.isAnnotationPresent(Url.class)) {
                        //nom_classe et nom_methode
                         String className = controller.getName();
                         String methodName = method.getName();
+                        String Verb = "GET"; // Par défaut, GET
 
-                        //@Get value
-                        Get getAnnotation = method.getAnnotation(Get.class);
-                        String url = getAnnotation.value();
+                        //@Url value
+                        Url urlAnnotation = method.getAnnotation(Url.class);
+                        String url = urlAnnotation.value();
+
+                        if (method.isAnnotationPresent(Post.class)) {
+                            Verb = "POST";
+                        } else if (method.isAnnotationPresent(Get.class)) {
+                            Verb = "GET";
+                        }
 
                         if (urlMappings.containsKey(url)) {
                         // L'URL est en double, lancer une exception DuplicateUrlException
                             throw new DuplicateUrlException("Erreur: L'URL " + url + " est déjà utilisée");
                         }
 
-                        Mapping mapping = new Mapping(className, methodName);
+                        Mapping mapping = new Mapping(className, methodName,Verb);
                         urlMappings.put(url, mapping); //add dans HashMap
                     }
                 }
@@ -108,6 +117,13 @@ public class FrontController extends HttpServlet {
         // Récupération nom_contrôleur et méthode
         String controllerName = mapping.getClassName();
         String methodName = mapping.getMethodName();
+        String verb = mapping.getVerb();
+
+        // Vérifier si le verbe de req correspond au verbe attendu (get ou post)
+        String requestMethod = req.getMethod();
+        if (!requestMethod.equalsIgnoreCase(verb)) {
+           throw new IllegalArgumentException("Erreur: La méthode HTTP '" + requestMethod + "' ne correspond pas avec l'annotation @" + verb + " pour l'URL " + url);
+        }
         // Créer une instance du contrôleur
         Class<?> controllerClass = Class.forName(controllerName);
         Object controllerInstance = controllerClass.newInstance();
