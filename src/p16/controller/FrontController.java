@@ -6,6 +6,7 @@ import p16.annotation.Post;
 import p16.annotation.RestApi;
 import p16.annotation.Url;
 import p16.exception.DuplicateUrlException;
+import p16.exception.ErrorPage;
 import p16.exception.ExceptionVerb;
 import p16.exception.NoPackageException;
 import p16.exception.TypeException;
@@ -137,9 +138,9 @@ public class FrontController extends HttpServlet {
                 mapping = urlMappings.get(url);
                 if (mapping == null) {
                     // L'URL n'est pas dans le mapping, afficher un message d'erreur
+                    resp.setContentType("text/html");
                     String errorMessage = "404 Not Found: URL indisponible";
-                    aff.println(errorMessage);
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, errorMessage);
+                    aff.println(ErrorPage.doError(errorMessage));
                 }
 
             String verb = req.getMethod();
@@ -153,12 +154,12 @@ public class FrontController extends HttpServlet {
                 
             // Vérifier si le verbe de req ne correspond pas au verbe attendu (get ou post)
             if (verbAction == null) {
+                resp.setContentType("text/html");
                 String errorMessage = "Erreur: Le verbe " + verb + " n'est pas supporté pour cette URL.";
-                aff.println(errorMessage);
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, errorMessage);
+                aff.println(ErrorPage.doError(errorMessage));
                 return;
             }
-            
+
             // Récupération nom_contrôleur et méthode
             String controllerName = mapping.getClassName();
             String methodName = verbAction.getMethod();
@@ -236,14 +237,9 @@ public class FrontController extends HttpServlet {
                     throw new TypeException("Erreur: Le type d'objet retourné n'est pas valide (String ou ModelView attendu)");
                 }
             }
-        } catch (UrlException e) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        } catch (TypeException e) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        } catch (ExceptionVerb e) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (Exception e) {
-            aff.println(e.getLocalizedMessage());
+            resp.setContentType("text/html");
+            aff.println(ErrorPage.doError(e.getMessage()));
         }
-    }
+    }    
 }
