@@ -1,21 +1,19 @@
 package p16.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Mapping {
     String className;
-    String methodName;
-    String verb;
+    List<VerbAction> verbAction = new ArrayList<VerbAction>();
 
     public Mapping(){}
-    
-    public Mapping(String className, String methodName) {
+    public Mapping(String className) {
         this.className = className;
-        this.methodName = methodName;
     }
-
-    public Mapping(String className, String methodName,String verb) {
+    public Mapping(String className, List<VerbAction> verbAction) {
         this.className = className;
-        this.methodName = methodName;
-        this.verb = verb;
+        this.verbAction = verbAction;
     }
 
     public String getClassName() {
@@ -24,17 +22,14 @@ public class Mapping {
     public void setClassName(String className) {
         this.className = className;
     }
-    public String getMethodName() {
-        return methodName;
+    public List<VerbAction> getVerbAction() {
+        return verbAction;
     }
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
+    public void setVerbAction(List<VerbAction> verbAction) {
+        this.verbAction = verbAction;
     }
-    public String getVerb() {
-        return verb;
-    }
-    
-    public void setVerb(String verb) {
-        this.verb = verb;
+
+    public void addVerbAction(VerbAction verbAction) {
+        this.verbAction.add(verbAction);
     }
 }
