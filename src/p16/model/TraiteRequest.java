@@ -14,6 +14,7 @@ import com.thoughtworks.paranamer.Paranamer;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import p16.annotation.Argument;
 
 public class TraiteRequest {
@@ -135,9 +136,18 @@ public class TraiteRequest {
             
             if (paramType == MySession.class) {
             HttpSession session = request.getSession();
-            MySession mySession = new MySession(session);
+            MySession mySession = new MySession(session); 
             parameterValues.add(mySession);
-    
+            
+            }else if (paramType == Part.class) {
+            // Gérer les fichiers via Part
+            String paramName = parameterNamesArray[i];
+            Part filePart = request.getPart(paramName);
+            if (filePart == null) {
+                throw new IllegalArgumentException("Fichier manquant pour le paramètre: " + paramName);
+            }
+            parameterValues.add(filePart);
+
             } else if (!paramType.isPrimitive() && paramType != String.class) {
                 if (param.isAnnotationPresent(Argument.class)) {
                     Argument argument = param.getAnnotation(Argument.class);
