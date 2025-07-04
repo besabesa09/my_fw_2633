@@ -11,15 +11,13 @@ public class ScanController {
         ArrayList<Class<?>> classes = new ArrayList<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String path = packageName.replace('.', '/');
-    
+
         URL resource = classLoader.getResource(path);
-    
         if (resource == null) {
             return classes;
         }
-    
+
         File packageDir = new File(resource.getFile().replace("%20", " "));
-    
         for (File file : packageDir.listFiles()) {
             if (file.isDirectory()) {
                 classes.addAll(allClasses(packageName + "." + file.getName()));
@@ -28,16 +26,16 @@ public class ScanController {
                 classes.add(Class.forName(className));
             }
         }
-    
+
         return classes;
     }
-    
-    public static ArrayList<Class<?>> goScan(String packageName, Class<? extends Annotation> annotationClass) throws ClassNotFoundException, IOException {
-        ArrayList<Class<?>> classes = allClasses(packageName);
 
-        ArrayList<Class<?>> result = new ArrayList<Class<?>>();
-        
-        for(Class<?> clazz : classes) {
+    public static ArrayList<Class<?>> goScan(String packageName, Class<? extends Annotation> annotationClass)
+            throws ClassNotFoundException, IOException {
+        ArrayList<Class<?>> classes = allClasses(packageName);
+        ArrayList<Class<?>> result = new ArrayList<>();
+
+        for (Class<?> clazz : classes) {
             if (clazz.isAnnotationPresent(annotationClass)) {
                 result.add(clazz);
             }

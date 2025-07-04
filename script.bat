@@ -21,8 +21,8 @@ cd ..
 
 @set libTest="D:\ITU\S5\FrameWork\Test\lib"
 
-jar cvf "sprint_2.jar" -C compiler/ .
-move "sprint_2.jar" %libTest%
+jar cvf "mySprint_2633.jar" -C compiler/ .
+move "mySprint_2633.jar" %libTest%
 
 rmdir /q/s "temp"
 rmdir /q/s "compiler"
